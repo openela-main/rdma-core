@@ -1,6 +1,6 @@
 Name: rdma-core
-Version: 44.0
-Release: 2%{?dist}.1
+Version: 46.0
+Release: 1%{?dist}.1
 Summary: RDMA core userspace libraries and daemons
 
 # Almost everything is licensed under the OFA dual GPLv2, 2 Clause BSD license
@@ -16,10 +16,6 @@ Source1: ibdev2netdev
 # are extracted from libibverbs-26.0-8.el8 .
 Source2: rxe_cfg
 Source3: rxe_cfg.8.gz
-# 0001-0003: https://github.com/linux-rdma/rdma-core/pull/1308
-Patch1: 0001-util-fix-overflow-in-remap_node_name.patch
-Patch2: 0002-infiniband-diags-drop-unnecessary-nodedesc-local-cop.patch
-Patch3: 0003-libibnetdisc-fix-printing-a-possibly-non-NUL-termina.patch
 # RHEL specific patch for OPA ibacm plugin
 Patch300: 0001-ibacm-acm.c-load-plugin-while-it-is-soft-link.patch
 Patch301: 0002-systemd-drop-Protect-options-not-supported-in-RHEL-8.patch
@@ -149,6 +145,8 @@ Provides: libhfi1 = %{version}-%{release}
 Obsoletes: libhfi1 < %{version}-%{release}
 Provides: libirdma = %{version}-%{release}
 Obsoletes: libirdma < %{version}-%{release}
+Provides: libmana = %{version}-%{release}
+Obsoletes: libmana < %{version}-%{release}
 Provides: libmlx4 = %{version}-%{release}
 Obsoletes: libmlx4 < %{version}-%{release}
 %ifnarch s390
@@ -173,6 +171,7 @@ Device-specific plug-in ibverbs userspace drivers are included:
 - libhfi1: Intel Omni-Path HFI
 - libhns: HiSilicon Hip06 SoC
 - libirdma: Intel Ethernet Connection RDMA
+- libmana: Microsoft Azure Network Adapter
 - libmlx4: Mellanox ConnectX-3 InfiniBand HCA
 - libmlx5: Mellanox Connect-IB/X-4+ InfiniBand HCA
 - libqedr: QLogic QL4xxx RoCE HCA
@@ -265,9 +264,6 @@ easy, object-oriented access to IB verbs.
 
 %prep
 %setup -q
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
 %patch300 -p1
 %patch301 -p1
 %if 0%{?fedora}
@@ -454,9 +450,11 @@ fi
 %ifnarch s390
 %{_mandir}/man3/mlx5dv*
 %{_mandir}/man3/mlx4dv*
+%{_mandir}/man3/manadv*
 %{_mandir}/man7/efadv*
 %{_mandir}/man7/mlx5dv*
 %{_mandir}/man7/mlx4dv*
+%{_mandir}/man7/manadv*
 %endif
 %{_mandir}/man3/ibnd_*
 
@@ -537,6 +535,7 @@ fi
 %ifnarch s390
 %{_libdir}/libmlx5.so.*
 %{_libdir}/libmlx4.so.*
+%{_libdir}/libmana.so.*
 %endif
 %config(noreplace) %{_sysconfdir}/libibverbs.d/*.driver
 %doc %{_docdir}/%{name}/libibverbs.md
@@ -632,6 +631,14 @@ fi
 %endif
 
 %changelog
+* Tue May 30 2023 Kamal Heib <kheib@redhat.com> - 46.0-1.1
+- Add gating tests
+- Resolves: rhbz#2170066
+
+* Thu May 25 2023 Kamal Heib <kheib@redhat.com> - 46.0-1
+- Rebase to upstream release v46.0
+- Resolves: rhbz#2170066, rhbz#2209685, rhbz#2159635, rhbz#2167517
+
 * Wed Feb 08 2023 Michal Schmidt <mschmidt@redhat.com> - 44.0-2.1
 - Do not use unsupported Protect* options in systemd unit files.
 - Resolves: rhbz#2141462
