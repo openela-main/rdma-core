@@ -1,6 +1,6 @@
 Name: rdma-core
-Version: 44.0
-Release: 2%{?dist}
+Version: 46.0
+Release: 1%{?dist}
 Summary: RDMA core userspace libraries and daemons
 
 # Almost everything is licensed under the OFA dual GPLv2, 2 Clause BSD license
@@ -10,10 +10,6 @@ Summary: RDMA core userspace libraries and daemons
 License: GPLv2 or BSD
 Url: https://github.com/linux-rdma/rdma-core
 Source: https://github.com/linux-rdma/rdma-core/releases/download/v%{version}/%{name}-%{version}.tar.gz
-# 0001-0003: https://github.com/linux-rdma/rdma-core/pull/1308
-Patch1: 0001-util-fix-overflow-in-remap_node_name.patch
-Patch2: 0002-infiniband-diags-drop-unnecessary-nodedesc-local-cop.patch
-Patch3: 0003-libibnetdisc-fix-printing-a-possibly-non-NUL-termina.patch
 Patch9000: 0003-CMakeLists-disable-providers-that-were-not-enabled-i.patch
 Patch9998: 9998-kernel-boot-Do-not-perform-device-rename-on-OPA-devi.patch
 Patch9999: 9999-udev-keep-NAME_KERNEL-as-default-interface-naming-co.patch
@@ -155,6 +151,8 @@ Provides: libhfi1 = %{version}-%{release}
 Obsoletes: libhfi1 < %{version}-%{release}
 Provides: libirdma = %{version}-%{release}
 Obsoletes: libirdma < %{version}-%{release}
+Provides: libmana = %{version}-%{release}
+Obsoletes: libmana < %{version}-%{release}
 Provides: libmlx4 = %{version}-%{release}
 Obsoletes: libmlx4 < %{version}-%{release}
 Provides: libmlx5 = %{version}-%{release}
@@ -179,6 +177,7 @@ Device-specific plug-in ibverbs userspace drivers are included:
 - libhfi1: Intel Omni-Path HFI
 - libhns: HiSilicon Hip06 SoC
 - libirdma: Intel Ethernet Connection RDMA
+- libmana: Microsoft Azure Network Adapter
 - libmlx4: Mellanox ConnectX-3 InfiniBand HCA
 - libmlx5: Mellanox Connect-IB/X-4+ InfiniBand HCA
 - libqedr: QLogic QL4xxx RoCE HCA
@@ -268,9 +267,6 @@ easy, object-oriented access to IB verbs.
 
 %prep
 %setup -q
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
 %if 0%{?fedora}
 %patch9998 -p1
 %endif
@@ -444,9 +440,11 @@ fi
 %{_mandir}/man7/rdma_cm.*
 %{_mandir}/man3/mlx5dv*
 %{_mandir}/man3/mlx4dv*
+%{_mandir}/man3/manadv*
 %{_mandir}/man7/efadv*
 %{_mandir}/man7/mlx5dv*
 %{_mandir}/man7/mlx4dv*
+%{_mandir}/man7/manadv*
 %{_mandir}/man3/ibnd_*
 
 %files -n infiniband-diags
@@ -523,6 +521,7 @@ fi
 %{_libdir}/libefa.so.*
 %{_libdir}/libibverbs*.so.*
 %{_libdir}/libibverbs/*.so
+%{_libdir}/libmana.so.*
 %{_libdir}/libmlx5.so.*
 %{_libdir}/libmlx4.so.*
 %config(noreplace) %{_sysconfdir}/libibverbs.d/*.driver
@@ -616,6 +615,10 @@ fi
 %endif
 
 %changelog
+* Wed May 24 2023 Kamal Heib <kheib@redhat.com> - 46.0-1
+- Rebase to upstream release v46.0
+- Resolves: rhbz#2159650, rhbz#2167513, rhbz#2170367, rhbz#2189721 rhbz#2209688
+
 * Wed Feb 01 2023 Michal Schmidt <mschmidt@redhat.com> - 44.0-2
 - Fix covscan-found issues.
 - Resolves: rhbz#2112984, rhbz#2142687
