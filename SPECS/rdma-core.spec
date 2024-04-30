@@ -1,5 +1,5 @@
 Name: rdma-core
-Version: 46.0
+Version: 48.0
 Release: 1%{?dist}
 Summary: RDMA core userspace libraries and daemons
 
@@ -615,6 +615,10 @@ fi
 %endif
 
 %changelog
+* Mon Sep 18 2023 Kamal Heib <kheib@redhat.com> - 48.0-1
+- Rebase to upstream release v48.0
+- Resolves: RHEL-884, RHEL-4800, RHEL-4799, RHEL-3527, RHEL-5486
+
 * Wed May 24 2023 Kamal Heib <kheib@redhat.com> - 46.0-1
 - Rebase to upstream release v46.0
 - Resolves: rhbz#2159650, rhbz#2167513, rhbz#2170367, rhbz#2189721 rhbz#2209688
