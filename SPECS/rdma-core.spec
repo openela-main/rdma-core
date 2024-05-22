@@ -1,6 +1,6 @@
 Name: rdma-core
-Version: 46.0
-Release: 1%{?dist}.1
+Version: 48.0
+Release: 1%{?dist}
 Summary: RDMA core userspace libraries and daemons
 
 # Almost everything is licensed under the OFA dual GPLv2, 2 Clause BSD license
@@ -631,6 +631,10 @@ fi
 %endif
 
 %changelog
+* Thu Sep 21 2023 Kamal Heib <kheib@redhat.com> - 48.0-1
+- Rebase to upstream release v48.0
+- Resolves: RHEL-930, RHEL-4240, RHEL-6281, RHEL-6078
+
 * Tue May 30 2023 Kamal Heib <kheib@redhat.com> - 46.0-1.1
 - Add gating tests
 - Resolves: rhbz#2170066
