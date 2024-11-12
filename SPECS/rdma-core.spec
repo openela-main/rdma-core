@@ -1,5 +1,5 @@
 Name: rdma-core
-Version: 48.0
+Version: 51.0
 Release: 1%{?dist}
 Summary: RDMA core userspace libraries and daemons
 
@@ -10,7 +10,6 @@ Summary: RDMA core userspace libraries and daemons
 License: GPLv2 or BSD
 Url: https://github.com/linux-rdma/rdma-core
 Source: https://github.com/linux-rdma/rdma-core/releases/download/v%{version}/%{name}-%{version}.tar.gz
-Patch9000: 0003-CMakeLists-disable-providers-that-were-not-enabled-i.patch
 Patch9998: 9998-kernel-boot-Do-not-perform-device-rename-on-OPA-devi.patch
 Patch9999: 9999-udev-keep-NAME_KERNEL-as-default-interface-naming-co.patch
 # Do not build static libs by default.
@@ -271,7 +270,6 @@ easy, object-oriented access to IB verbs.
 %patch9998 -p1
 %endif
 %if 0%{?rhel}
-%patch9000 -p1
 %patch9999 -p1
 %endif
 
@@ -398,6 +396,7 @@ fi
 %config(noreplace) %{_sysconfdir}/rdma/modules/roce.conf
 %dir %{_sysconfdir}/modprobe.d
 %config(noreplace) %{_sysconfdir}/modprobe.d/mlx4.conf
+%config(noreplace) %{_sysconfdir}/modprobe.d/truescale.conf
 %{_unitdir}/rdma-hw.target
 %{_unitdir}/rdma-load-modules@.service
 %dir %{dracutlibdir}
@@ -415,6 +414,7 @@ fi
 %dir %{sysmodprobedir}
 %{sysmodprobedir}/libmlx4.conf
 %{_libexecdir}/mlx4-setup.sh
+%{_libexecdir}/truescale-serdes.cmds
 %{_sbindir}/rdma-ndd
 %{_unitdir}/rdma-ndd.service
 %{_mandir}/man7/rxe*
@@ -433,6 +433,7 @@ fi
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/*.pc
 %{_mandir}/man3/efadv*
+%{_mandir}/man3/hnsdv*
 %{_mandir}/man3/ibv_*
 %{_mandir}/man3/rdma*
 %{_mandir}/man3/umad*
@@ -442,6 +443,7 @@ fi
 %{_mandir}/man3/mlx4dv*
 %{_mandir}/man3/manadv*
 %{_mandir}/man7/efadv*
+%{_mandir}/man7/hnsdv*
 %{_mandir}/man7/mlx5dv*
 %{_mandir}/man7/mlx4dv*
 %{_mandir}/man7/manadv*
@@ -519,6 +521,7 @@ fi
 %dir %{_sysconfdir}/libibverbs.d
 %dir %{_libdir}/libibverbs
 %{_libdir}/libefa.so.*
+%{_libdir}/libhns.so.*
 %{_libdir}/libibverbs*.so.*
 %{_libdir}/libibverbs/*.so
 %{_libdir}/libmana.so.*
@@ -615,6 +618,10 @@ fi
 %endif
 
 %changelog
+* Mon Apr 22 2024 Kamal Heib <kheib@redhat.com> - 51.0-1
+- Rebase to upstream release v51.0
+- Resolves: RHEL-24473, RHEL-23180
+
 * Mon Sep 18 2023 Kamal Heib <kheib@redhat.com> - 48.0-1
 - Rebase to upstream release v48.0
 - Resolves: RHEL-884, RHEL-4800, RHEL-4799, RHEL-3527, RHEL-5486
