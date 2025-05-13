@@ -1,5 +1,5 @@
 Name: rdma-core
-Version: 51.0
+Version: 54.0
 Release: 1%{?dist}
 Summary: RDMA core userspace libraries and daemons
 
@@ -618,6 +618,10 @@ fi
 %endif
 
 %changelog
+* Tue Oct 29 2024 Kamal Heib <kheib@redhat.com> - 54.0-1
+- Rebase to upstream release v54.0
+- Resolves: RHEL-52886, RHEL-54647, RHEL-51876
+
 * Mon Apr 22 2024 Kamal Heib <kheib@redhat.com> - 51.0-1
 - Rebase to upstream release v51.0
 - Resolves: RHEL-24473, RHEL-23180
