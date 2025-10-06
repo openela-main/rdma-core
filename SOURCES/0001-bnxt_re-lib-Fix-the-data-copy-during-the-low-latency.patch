@@ -1,0 +1,34 @@
+From 9558f227b158291bc3eb7044938d711e388802ce Mon Sep 17 00:00:00 2001
+From: Selvin Xavier <selvin.xavier@broadcom.com>
+Date: Mon, 10 Mar 2025 07:38:03 -0700
+Subject: [PATCH] bnxt_re/lib: Fix the data copy during the low latency push
+ path
+
+The pointer used in the destination buffer is not correctly
+type casted, because of which the data gets corrupted while copying.
+The issue is seen in the previous adapters that has the low latency
+push enabled. Fixing the pointer casting.
+
+Fixes: 52d0870c3eac ("bnxt_re/lib: Enable low latency push")
+Reported-By: Kamal Heib <kheib@redhat.com>
+Signed-off-by: Selvin Xavier <selvin.xavier@broadcom.com>
+---
+ providers/bnxt_re/main.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/providers/bnxt_re/main.h b/providers/bnxt_re/main.h
+index 7a9d48e1cf01..067b0c18df8d 100644
+--- a/providers/bnxt_re/main.h
++++ b/providers/bnxt_re/main.h
+@@ -598,7 +598,7 @@ static inline void bnxt_re_copy_data_to_pb(struct bnxt_re_push_buffer *pbuf,
+ 	int indx;
+ 
+ 	for (indx = 0; indx < idx; indx++) {
+-		dst = (uintptr_t *)(pbuf->pbuf + 2 * (indx + offset));
++		dst = (uintptr_t *)(pbuf->pbuf) + 2 * indx + offset;
+ 		src = (uintptr_t *)(pbuf->wqe[indx]);
+ 		mmio_write64(dst, *src);
+ 
+-- 
+2.49.0
+
