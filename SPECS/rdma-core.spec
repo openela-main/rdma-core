@@ -1,6 +1,6 @@
 Name: rdma-core
 Version: 54.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: RDMA core userspace libraries and daemons
 
 # Almost everything is licensed under the OFA dual GPLv2, 2 Clause BSD license
@@ -10,6 +10,7 @@ Summary: RDMA core userspace libraries and daemons
 License: GPLv2 or BSD
 Url: https://github.com/linux-rdma/rdma-core
 Source: https://github.com/linux-rdma/rdma-core/releases/download/v%{version}/%{name}-%{version}.tar.gz
+Patch0001: 0001-bnxt_re-lib-Fix-the-data-copy-during-the-low-latency.patch
 Patch9998: 9998-kernel-boot-Do-not-perform-device-rename-on-OPA-devi.patch
 Patch9999: 9999-udev-keep-NAME_KERNEL-as-default-interface-naming-co.patch
 # Do not build static libs by default.
@@ -266,6 +267,7 @@ easy, object-oriented access to IB verbs.
 
 %prep
 %setup -q
+%patch0001 -p1
 %if 0%{?fedora}
 %patch9998 -p1
 %endif
@@ -618,6 +620,10 @@ fi
 %endif
 
 %changelog
+* Fri May 02 2025 Kamal Heib <kheib@redhat.com> - 54.0-2
+- Fix data corruption in bnxt_re
+- Resolves: RHEL-89425
+
 * Tue Oct 29 2024 Kamal Heib <kheib@redhat.com> - 54.0-1
 - Rebase to upstream release v54.0
 - Resolves: RHEL-52886, RHEL-54647, RHEL-51876
