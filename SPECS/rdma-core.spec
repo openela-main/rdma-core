@@ -1,5 +1,5 @@
 Name: rdma-core
-Version: 54.0
+Version: 57.0
 Release: 2%{?dist}
 Summary: RDMA core userspace libraries and daemons
 
@@ -10,7 +10,8 @@ Summary: RDMA core userspace libraries and daemons
 License: GPLv2 or BSD
 Url: https://github.com/linux-rdma/rdma-core
 Source: https://github.com/linux-rdma/rdma-core/releases/download/v%{version}/%{name}-%{version}.tar.gz
-Patch0001: 0001-bnxt_re-lib-Fix-the-data-copy-during-the-low-latency.patch
+Patch0001: 0001-tests-Ensure-graceful-resource-cleaning.patch
+Patch0002: 0002-pyverbs-Change-PD-object-return-type.patch
 Patch9998: 9998-kernel-boot-Do-not-perform-device-rename-on-OPA-devi.patch
 Patch9999: 9999-udev-keep-NAME_KERNEL-as-default-interface-naming-co.patch
 # Do not build static libs by default.
@@ -267,12 +268,13 @@ easy, object-oriented access to IB verbs.
 
 %prep
 %setup -q
-%patch0001 -p1
+%patch -P 0001 -p1
+%patch -P 0002 -p1
 %if 0%{?fedora}
-%patch9998 -p1
+%patch -P 9998 -p1
 %endif
 %if 0%{?rhel}
-%patch9999 -p1
+%patch -P 9999 -p1
 %endif
 
 %build
@@ -360,6 +362,17 @@ if [ -x /sbin/udevadm ]; then
 /sbin/udevadm trigger --subsystem-match=net --action=change || true
 /sbin/udevadm trigger --subsystem-match=infiniband_mad --action=change || true
 fi
+%systemd_post rdma-load-modules@rdma.service
+%systemd_post rdma-load-modules@infiniband.service
+%systemd_post rdma-load-modules@roce.service
+%preun -n rdma-core
+%systemd_preun rdma-load-modules@rdma.service
+%systemd_preun rdma-load-modules@infiniband.service
+%systemd_preun rdma-load-modules@roce.service
+%postun -n rdma-core
+%systemd_postun_with_restart rdma-load-modules@rdma.service
+%systemd_postun_with_restart rdma-load-modules@infiniband.service
+%systemd_postun_with_restart rdma-load-modules@roce.service
 
 %post -n ibacm
 %systemd_post ibacm.service
@@ -620,9 +633,17 @@ fi
 %endif
 
 %changelog
-* Fri May 02 2025 Kamal Heib <kheib@redhat.com> - 54.0-2
+* Thu Aug 07 2025 Kamal Heib <kheib@redhat.com> - 57.0-2
+- Fix pyverbs tests
+- Resolves: RHEL-107929, RHEL-107930
+
+* Tue May 27 2025 Kamal Heib <kheib@redhat.com> - 57.0-1
+- Rebase to upstream release v57.0
+- Resolves: RHEL-76570, RHEL-45644, RHEL-72077, RHEL-68506, RHEL-94449
+
+* Wed Apr 30 2025 Kamal Heib <kheib@redhat.com>
 - Fix data corruption in bnxt_re
-- Resolves: RHEL-89425
+- Resolves: RHEL-89179
 
 * Tue Oct 29 2024 Kamal Heib <kheib@redhat.com> - 54.0-1
 - Rebase to upstream release v54.0
