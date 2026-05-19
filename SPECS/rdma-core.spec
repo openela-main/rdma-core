@@ -1,5 +1,5 @@
 Name: rdma-core
-Version: 57.0
+Version: 61.0
 Release: 2%{?dist}
 Summary: RDMA core userspace libraries and daemons
 
@@ -10,8 +10,6 @@ Summary: RDMA core userspace libraries and daemons
 License: GPLv2 or BSD
 Url: https://github.com/linux-rdma/rdma-core
 Source: https://github.com/linux-rdma/rdma-core/releases/download/v%{version}/%{name}-%{version}.tar.gz
-Patch0001: 0001-tests-Ensure-graceful-resource-cleaning.patch
-Patch0002: 0002-pyverbs-Change-PD-object-return-type.patch
 Patch9998: 9998-kernel-boot-Do-not-perform-device-rename-on-OPA-devi.patch
 Patch9999: 9999-udev-keep-NAME_KERNEL-as-default-interface-naming-co.patch
 # Do not build static libs by default.
@@ -268,8 +266,6 @@ easy, object-oriented access to IB verbs.
 
 %prep
 %setup -q
-%patch -P 0001 -p1
-%patch -P 0002 -p1
 %if 0%{?fedora}
 %patch -P 9998 -p1
 %endif
@@ -332,10 +328,10 @@ mkdir -p %{buildroot}/%{_sysconfdir}/rdma
 %global sysmodprobedir %{_prefix}/lib/modprobe.d
 mkdir -p %{buildroot}%{_libexecdir}
 mkdir -p %{buildroot}%{_udevrulesdir}
-mkdir -p %{buildroot}%{dracutlibdir}/modules.d/05rdma
+mkdir -p %{buildroot}%{dracutlibdir}/modules.d/50rdma
 mkdir -p %{buildroot}%{sysmodprobedir}
 install -D -m0644 redhat/rdma.mlx4.conf %{buildroot}/%{_sysconfdir}/rdma/mlx4.conf
-install -D -m0755 redhat/rdma.modules-setup.sh %{buildroot}%{dracutlibdir}/modules.d/05rdma/module-setup.sh
+install -D -m0755 kernel-boot/dracut/50rdma/module-setup.sh %{buildroot}%{dracutlibdir}/modules.d/50rdma/module-setup.sh
 install -D -m0644 redhat/rdma.mlx4.sys.modprobe %{buildroot}%{sysmodprobedir}/libmlx4.conf
 install -D -m0755 redhat/rdma.mlx4-setup.sh %{buildroot}%{_libexecdir}/mlx4-setup.sh
 rm -f %{buildroot}%{_sysconfdir}/rdma/modules/rdma.conf
@@ -416,8 +412,8 @@ fi
 %{_unitdir}/rdma-load-modules@.service
 %dir %{dracutlibdir}
 %dir %{dracutlibdir}/modules.d
-%dir %{dracutlibdir}/modules.d/05rdma
-%{dracutlibdir}/modules.d/05rdma/module-setup.sh
+%dir %{dracutlibdir}/modules.d/50rdma
+%{dracutlibdir}/modules.d/50rdma/module-setup.sh
 %dir %{_udevrulesdir}
 %{_udevrulesdir}/../rdma_rename
 %{_udevrulesdir}/60-rdma-ndd.rules
@@ -432,6 +428,7 @@ fi
 %{_libexecdir}/truescale-serdes.cmds
 %{_sbindir}/rdma-ndd
 %{_unitdir}/rdma-ndd.service
+%{_sbindir}/rdma_topo
 %{_mandir}/man7/rxe*
 %{_mandir}/man8/rdma-ndd.*
 %license COPYING.*
@@ -539,6 +536,7 @@ fi
 %{_libdir}/libhns.so.*
 %{_libdir}/libibverbs*.so.*
 %{_libdir}/libibverbs/*.so
+%{_libdir}/libionic.so.*
 %{_libdir}/libmana.so.*
 %{_libdir}/libmlx5.so.*
 %{_libdir}/libmlx4.so.*
@@ -633,6 +631,26 @@ fi
 %endif
 
 %changelog
+* Wed Jan 07 2026 Kamal Heib <kheib@redhat.com> - 61.0-2
+- Rebuilt for gating testing
+- Resolves: RHEL-98270, RHEL-97696, RHEL-97692, RHEL-97648, RHEL-95331
+
+* Mon Jan 05 2026 Kamal Heib <kheib@redhat.com> - 61.0-1
+- Rebase to upstream release v61.0
+- Resolves: RHEL-98270, RHEL-97696, RHEL-97692, RHEL-97648, RHEL-95331
+
+* Wed Dec 17 2025 Kamal Heib <kheib@redhat.com> - 60.0-3
+- bump release to rebuild in sidetag
+- Resolves: RHEL-98270, RHEL-97696, RHEL-97692, RHEL-97648, RHEL-95331
+
+* Wed Dec 10 2025 Kamal Heib <kheib@redhat.com> - 60.0-2
+- bump release to rebuild in sidetag
+- Resolves: RHEL-98270, RHEL-100679, RHEL-97696, RHEL-97692, RHEL-97648, RHEL-95331
+
+* Mon Dec 01 2025 Kamal Heib <kheib@redhat.com> - 60.0-1
+- Rebase to upstream release v60.0
+- Resolves: RHEL-98270, RHEL-100679, RHEL-97696, RHEL-97692, RHEL-97648, RHEL-95331
+
 * Thu Aug 07 2025 Kamal Heib <kheib@redhat.com> - 57.0-2
 - Fix pyverbs tests
 - Resolves: RHEL-107929, RHEL-107930
